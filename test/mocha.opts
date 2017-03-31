@@ -1,0 +1,5 @@
+--compilers js:babel-core/register
+--watch
+--growl
+--reporter spec
+--recursive
