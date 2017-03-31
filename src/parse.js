@@ -1,14 +1,7 @@
-import numberParser from './numberParser'
-
-const REGEXPS = [
-    {
-        re: /\d+/g,
-        callback: numberParser
-    }
-]
+import parsers from './parsers'
 
 export default str => {
-    return REGEXPS.reduce((a,b) => {
-        return a.replace(b.re, b.callback)
+    return parsers.reduce((a,b) => {
+        return a.replace(b.regexp, b.replacer)
     }, str)
 }
