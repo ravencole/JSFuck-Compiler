@@ -45,14 +45,15 @@ export default (() => {
                     "[" + SIMPLE[c] + "]+[]" :
                     MAPPING[c] ?
                         MAPPING[c] :
-                        decorate.stringFromCharCode(c)
+                        decorate.stringFromCharCode(c, encode)
             )
         })
 
         return decorate.jSFuckString(
             decorate.digit(OUTPUT.join('+'), input), 
             wrapWithEval, 
-            runInParentScope
+            runInParentScope,
+            encode
         )
     }
 

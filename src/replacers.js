@@ -12,20 +12,10 @@ import {
 
 /*---------------------------EXPORTS---------------------------*/
 
-export const digitReplacer = CHAR_MAP => {
-    return (_,x) => CHAR_MAP[x]
-}
-
-export const simpleReplacer = SIMPLE => {
-    return c => SIMPLE[c]
-}
-
-export const constructorReplacer = CONSTRUCTORS => {
-    return c => CONSTRUCTORS[c] + '["constructor"]'
-}
-
+export const digitReplacer = CHAR_MAP => (_,x) => CHAR_MAP[x]
+export const simpleReplacer = SIMPLE => c => SIMPLE[c]
+export const constructorReplacer = CONSTRUCTORS => c => CONSTRUCTORS[c] + '["constructor"]'
 export const mappingReplacer = (_,b) => b.split("").join("+")
-
 export const numberReplacer = CHAR_MAP => {
     return (_,y) => {
         const [head, ...values] = y.split(""),
@@ -36,7 +26,6 @@ export const numberReplacer = CHAR_MAP => {
         return [output,...values].join("+").replace(/(\d)/g, digitReplacer(CHAR_MAP));
     }
 }
-
 export function replaceMap(_map){
     const CHAR_MAP = _map,
           SIMPLE_TOKENS_REGEXP = new RegExp(Object.keys(SIMPLE).join('|'), 'g'),
@@ -51,10 +40,10 @@ export function replaceMap(_map){
           ENCODE_SIDE_BY_SIDE_DOUBLE_QUOTES = replace(/""/g, "[]+[]")
 
     const ENCODED_MAP = [...Array(MAX-MIN)].reduce((a,_,i) => {
-        const CHARACTER = String.fromCharCode(i+MIN)
+        const CHAR = String.fromCharCode(i+MIN)
 
-        if ( CHAR_MAP[CHARACTER] ){
-            a[CHARACTER] = compose(
+        if ( CHAR_MAP[ CHAR ] ){
+            a[ CHAR ] = compose(
                 ENCODE_SIDE_BY_SIDE_DOUBLE_QUOTES,
                 ENCODE_TO_STRING,
                 ENCODE_GLOBAL,
@@ -63,7 +52,7 @@ export function replaceMap(_map){
                 ENCODE_LARGE_NUMBERS,
                 ENCODE_SIMPLE_TOKENS,
                 ENCODE_CONSTRUCTOR_TOKENS
-            )(CHAR_MAP[CHARACTER])
+            )(CHAR_MAP[ CHAR ])
         }
 
         return a
@@ -79,7 +68,7 @@ export function replaceStrings(_map){
                 a[b] = _map[b].replace(/\"([^\"]+)\"/gi, mappingReplacer)
                 return a
           },{}),
-          UNENCODED_CHARACTERS = /[^\[\]\(\)\!\+]{1}/g,
+          UNENCODED_CHARACTERS_RE = /[^\[\]\(\)\!\+]{1}/g,
           ASCII_COUNT = MAX - MIN,
           valueReplacer = c =>  missing[c] ? c : MAPPING[c]
 
@@ -89,7 +78,7 @@ export function replaceStrings(_map){
         for (const CHAR in MAPPING){
             const VALUE = MAPPING[CHAR]
 
-            if (VALUE.match(UNENCODED_CHARACTERS)){
+            if (VALUE.match(UNENCODED_CHARACTERS_RE)){
                 missing[CHAR] = VALUE;
                 return true
             }
@@ -100,7 +89,7 @@ export function replaceStrings(_map){
 
     while (findMissing()){
         for (const CHAR in missing){
-            const VALUE = MAPPING[CHAR].replace(UNENCODED_CHARACTERS, valueReplacer);
+            const VALUE = MAPPING[CHAR].replace(UNENCODED_CHARACTERS_RE, valueReplacer);
 
             MAPPING[CHAR] = VALUE;
             missing[CHAR] = VALUE;
