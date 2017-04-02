@@ -24,32 +24,45 @@ export const constructorReplacer = CONSTRUCTORS => {
     return c => CONSTRUCTORS[c] + '["constructor"]'
 }
 
+export const mappingReplacer = (_,b) => b.split("").join("+")
+
+export const numberReplacer = CHAR_MAP => {
+    return (_,y) => {
+        const [head, ...values] = y.split(""),
+              output = head < 1 ? 
+                            "+[]" : 
+                            "+!+[]".repeat(+head).substr(+(head > 1))
+
+        return [output,...values].join("+").replace(/(\d)/g, digitReplacer(CHAR_MAP));
+    }
+}
+
 export function replaceMap(_map){
     const CHAR_MAP = _map,
           SIMPLE_TOKENS_REGEXP = new RegExp(Object.keys(SIMPLE).join('|'), 'g'),
           CONSTRUCTOR_TOKENS_REGEXP = new RegExp(Object.keys(CONSTRUCTORS).join('|'), 'g'),
-          numberReplacer = (_,y) => {
-                const [head, ...values] = y.split(""),
-                      output = head < 1 ? 
-                                    "+[]" : 
-                                    "+!+[]".repeat(+head).substr(+(head > 1))
-
-                return [output,...values].join("+").replace(/(\d)/g, digitReplacer(CHAR_MAP));
-          }
+          ENCODE_CONSTRUCTOR_TOKENS = replace(CONSTRUCTOR_TOKENS_REGEXP, constructorReplacer(CONSTRUCTORS)),
+          ENCODE_SIMPLE_TOKENS = replace(SIMPLE_TOKENS_REGEXP, simpleReplacer(SIMPLE)),
+          ENCODE_LARGE_NUMBERS = replace(/(\d\d+)/g, numberReplacer(CHAR_MAP)),
+          ENCODE_PAREN_NUMBERS = replace(/\((\d)\)/g, digitReplacer(CHAR_MAP)),
+          ENCODE_BRACKETED_NUMBERS = replace(/\[(\d)\]/g, digitReplacer(CHAR_MAP)),
+          ENCODE_GLOBAL = replace(/GLOBAL/g, GLOBAL),
+          ENCODE_TO_STRING = replace(/\+""/g, "+[]"),
+          ENCODE_SIDE_BY_SIDE_DOUBLE_QUOTES = replace(/""/g, "[]+[]")
 
     const ENCODED_MAP = [...Array(MAX-MIN)].reduce((a,_,i) => {
-        const CHARACTER = String.fromCharCode(i+MIN);
+        const CHARACTER = String.fromCharCode(i+MIN)
 
         if ( CHAR_MAP[CHARACTER] ){
             a[CHARACTER] = compose(
-                replace('""', "[]+[]"),
-                replace('\\+""', "+[]"),
-                replace("GLOBAL", GLOBAL),
-                replace('\\[(\\d)\\]', digitReplacer(CHAR_MAP)),
-                replace('\\((\\d)\\)', digitReplacer(CHAR_MAP)),
-                replace('(\\d\\d+)', numberReplacer),
-                replace(SIMPLE_TOKENS_REGEXP, simpleReplacer(SIMPLE)),
-                replace(CONSTRUCTOR_TOKENS_REGEXP, constructorReplacer(CONSTRUCTORS))
+                ENCODE_SIDE_BY_SIDE_DOUBLE_QUOTES,
+                ENCODE_TO_STRING,
+                ENCODE_GLOBAL,
+                ENCODE_BRACKETED_NUMBERS,
+                ENCODE_PAREN_NUMBERS,
+                ENCODE_LARGE_NUMBERS,
+                ENCODE_SIMPLE_TOKENS,
+                ENCODE_CONSTRUCTOR_TOKENS
             )(CHAR_MAP[CHARACTER])
         }
 
@@ -60,12 +73,14 @@ export function replaceMap(_map){
 }
 
 export function replaceStrings(_map){
-    var value, missing;
+    var missing;
 
-    const MAPPING = _map,
+    const MAPPING = Object.keys(_map).reduce((a,b) => {
+                a[b] = _map[b].replace(/\"([^\"]+)\"/gi, mappingReplacer)
+                return a
+          },{}),
           UNENCODED_CHARACTERS = /[^\[\]\(\)\!\+]{1}/g,
           ASCII_COUNT = MAX - MIN,
-          mappingReplacer = (_,b) => b.split("").join("+"),
           valueReplacer = c =>  missing[c] ? c : MAPPING[c]
 
     function findMissing(){
@@ -83,10 +98,6 @@ export function replaceStrings(_map){
         return false
     }
 
-    for (const CHAR in MAPPING){
-        MAPPING[CHAR] = MAPPING[CHAR].replace(/\"([^\"]+)\"/gi, mappingReplacer);
-    }
-
     while (findMissing()){
         for (const CHAR in missing){
             const VALUE = MAPPING[CHAR].replace(UNENCODED_CHARACTERS, valueReplacer);
@@ -94,10 +105,9 @@ export function replaceStrings(_map){
             MAPPING[CHAR] = VALUE;
             missing[CHAR] = VALUE;
         }
-
-        if (ASCII_COUNT - 1 === 0){
-            console.error("Could not compile the following chars:", missing);
-        }
+        // if (ASCII_COUNT - 1 === 0){
+        //     console.error("Could not compile the following chars:", missing);
+        // }
     }
 
     return MAPPING
