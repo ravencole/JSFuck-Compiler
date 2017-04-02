@@ -1,13 +1,7 @@
-export const compose = (fn, ...rest) =>
+export const compose = (cb, ...rest) =>
     rest.length === 0 ?
-        fn :
-        (...args) => fn(compose(...rest)(...args));
+        cb :
+        (...args) => cb(compose(...rest)(...args));
 
-export const replace = (pattern, replacement) => {
-    return value => {
-        return value.replace(
-            new RegExp(pattern, "gi"),
-            replacement
-        )
-    }
-}
+export const replace = (pattern, replacement) => 
+    value => value.replace(new RegExp(pattern, "gi"), replacement)
