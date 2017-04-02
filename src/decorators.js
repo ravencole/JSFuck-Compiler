@@ -2,30 +2,28 @@ export const jSFuckString = (output, _eval, scope, encode) => {
     return _eval ? 
                 scope ?
                     "[][" + encode("fill") + "]" + "[" + encode("constructor") + "]" + "(" + encode("return eval") +  ")()" +"(" + output + ")" :
-                    "[][" + encode("fill") + "]" + "[" + encode("constructor") + "]" + "(" + output + ")()" :
+                    "[][" + encode("fill") + "]" + "[" + encode("constructor") + "]" +                                       "(" + output + ")()" :
            output
 }
 
-export const digit = (output, input) => {
-    return /^\d$/.test(input) ?
-           output += "+[]" :
-           output
-}
+export const digit = (output, input) =>
+    /^\d$/.test(input) ?
+        output += "+[]" :
+        output
 
-export const number = ( str,num ) => '[' + str.substr(+(num > 1)) + ']'
+export const number = ( str,num ) => 
+    '[' + str.substr(+(num > 1)) + ']'
 
-export const stringFromCharCode = (c, encode) => {
-    // String["constructor"]["fromCharCode"](c)
-    return `([]+[])[${ encode("constructor" )}]` 
+export const stringFromCharCode = (c, encode) => 
+    `([]+[])[${encode("constructor" )}]` 
          + `[${encode("fromCharCode")}]`
          + `(${encode(c.charCodeAt(0) + "")})`
-}
 
-export const escapeCharacters = key => {
-    return 'Function("return unescape")()("%"'
+
+export const escapeCharacters = key => 
+    'Function("return unescape")()("%"'
          + key.charCodeAt(0).toString(16).replace(/(\d+)/g, "+($1)+\"") 
          + '")'
-}
 
 export default {
     jSFuckString,

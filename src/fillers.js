@@ -1,4 +1,4 @@
-/*---------------------------IMPORTS---------------------------*/
+                                                                                                                       /*---------------------------IMPORTS---------------------------*/
 
 import decorate from './decorators'
 import { USE_CHAR_CODE } from './encodingsMap'

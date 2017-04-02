@@ -12,10 +12,18 @@ import {
 
 /*---------------------------EXPORTS---------------------------*/
 
-export const digitReplacer = CHAR_MAP => (_,x) => CHAR_MAP[x]
-export const simpleReplacer = SIMPLE => c => SIMPLE[c]
-export const constructorReplacer = CONSTRUCTORS => c => CONSTRUCTORS[c] + '["constructor"]'
-export const mappingReplacer = (_,b) => b.split("").join("+")
+export const digitReplacer = CHAR_MAP => 
+  (_,x) => CHAR_MAP[x]
+
+export const simpleReplacer = SIMPLE => 
+  c => SIMPLE[c]
+
+export const constructorReplacer = CONSTRUCTORS => 
+  c => CONSTRUCTORS[c] + '["constructor"]'
+
+export const mappingReplacer = (_,b) => 
+  b.split("").join("+")
+
 export const numberReplacer = CHAR_MAP => {
     return (_,y) => {
         const [head, ...values] = y.split(""),
@@ -23,21 +31,35 @@ export const numberReplacer = CHAR_MAP => {
                             "+[]" : 
                             "+!+[]".repeat(+head).substr(+(head > 1))
 
-        return [output,...values].join("+").replace(/(\d)/g, digitReplacer(CHAR_MAP));
+        return [
+          output,
+          ...values
+        ].join("+").replace(/(\d)/g, digitReplacer(CHAR_MAP));
     }
 }
+
 export function replaceMap(_map){
     const CHAR_MAP = _map,
-          SIMPLE_TOKENS_REGEXP = new RegExp(Object.keys(SIMPLE).join('|'), 'g'),
-          CONSTRUCTOR_TOKENS_REGEXP = new RegExp(Object.keys(CONSTRUCTORS).join('|'), 'g'),
-          ENCODE_CONSTRUCTOR_TOKENS = replace(CONSTRUCTOR_TOKENS_REGEXP, constructorReplacer(CONSTRUCTORS)),
-          ENCODE_SIMPLE_TOKENS = replace(SIMPLE_TOKENS_REGEXP, simpleReplacer(SIMPLE)),
-          ENCODE_LARGE_NUMBERS = replace(/(\d\d+)/g, numberReplacer(CHAR_MAP)),
-          ENCODE_PAREN_NUMBERS = replace(/\((\d)\)/g, digitReplacer(CHAR_MAP)),
-          ENCODE_BRACKETED_NUMBERS = replace(/\[(\d)\]/g, digitReplacer(CHAR_MAP)),
-          ENCODE_GLOBAL = replace(/GLOBAL/g, GLOBAL),
-          ENCODE_TO_STRING = replace(/\+""/g, "+[]"),
-          ENCODE_SIDE_BY_SIDE_DOUBLE_QUOTES = replace(/""/g, "[]+[]")
+          SIMPLE_TOKENS_REGEXP
+              = new RegExp(Object.keys(SIMPLE).join('|'), 'g'),
+          CONSTRUCTOR_TOKENS_REGEXP 
+              = new RegExp(Object.keys(CONSTRUCTORS).join('|'), 'g'),
+          ENCODE_CONSTRUCTOR_TOKENS 
+              = replace(CONSTRUCTOR_TOKENS_REGEXP, constructorReplacer(CONSTRUCTORS)),
+          ENCODE_SIMPLE_TOKENS      
+              = replace(SIMPLE_TOKENS_REGEXP, simpleReplacer(SIMPLE)),
+          ENCODE_LARGE_NUMBERS      
+              = replace(/(\d\d+)/g, numberReplacer(CHAR_MAP)),
+          ENCODE_PAREN_NUMBERS      
+              = replace(/\((\d)\)/g, digitReplacer(CHAR_MAP)),
+          ENCODE_BRACKETED_NUMBERS  
+              = replace(/\[(\d)\]/g, digitReplacer(CHAR_MAP)),
+          ENCODE_GLOBAL             
+              = replace(/GLOBAL/g, GLOBAL),
+          ENCODE_TO_STRING          
+              = replace(/\+""/g, "+[]"),
+          ENCODE_SIDE_BY_SIDE_DOUBLE_QUOTES 
+              = replace(/""/g, "[]+[]")
 
     const ENCODED_MAP = [...Array(MAX-MIN)].reduce((a,_,i) => {
         const CHAR = String.fromCharCode(i+MIN)
