@@ -2,18 +2,14 @@
 
 import decorate from './decorators'
 
-import { compose, replace } from './utils'
+import { compose } from './utils'
 
 import { 
-    CHAR_MAP, USE_CHAR_CODE, 
-    MIN, MAX, SIMPLE,
-    CONSTRUCTORS, GLOBAL
+    CHAR_MAP, 
+    SIMPLE
 } from './encodingsMap'
 
 import {
-    digitReplacer,
-    simpleReplacer,
-    constructorReplacer,
     replaceMap,
     replaceStrings
 } from './replacers'
