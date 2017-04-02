@@ -2,7 +2,7 @@ import { assert } from 'chai'
 
 import transpile from '../src/transpiler'
 
-const encode = transpile.JSFuck.encode
+const encode = transpile.encode
 
 describe('JSFuck', () => {
     [

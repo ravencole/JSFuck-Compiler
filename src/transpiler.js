@@ -58,8 +58,6 @@ export default (() => {
     }
 
     return {
-        JSFuck: {
-            encode: encode
-        }
+        encode
     }
 })()
