@@ -1,62 +1,64 @@
-import { SIMPLE, CHARACTERS, CONSTRUCTORS } from './encodingsMap'
+/*---------------------------IMPORTS---------------------------*/
 
-const compose = function(...args) {
-          return (result) => {
-            for (let i = args.length - 1; i > -1; i--) {
-              result = args[i].call(this, result)
-            }
+import decorate from './decorators'
 
-            return result
-          }
-        },
-      SIMPLE_KEYWORDS_OR_ALL_RE = /false|true|Infinity|NaN|undefined|./g,
-      SIMPLE_BRACKETS = n => `[${  SIMPLE[n]  }]+[]`,
-      REPLACE_DIGITS = num => {
-            const NUM = num.split('').map(n => {
-                const ZERO = '+[]',
-                      ONE = '+!+[]'
+import { compose, replace } from './utils'
 
-                return +n === 0 ?
-                    ZERO :
-                    [...Array(+n+1)].join(ONE)
-            })
+import { 
+    CHAR_MAP, USE_CHAR_CODE, 
+    MIN, MAX, SIMPLE,
+    CONSTRUCTORS, GLOBAL
+} from './encodingsMap'
 
-            return NUM.length <= 1 ?
-                `[${NUM[0]}]` :
-                '[' + NUM.map(n => {
-                    return `[${n}]`
-                }).join('+') + ']'
-        },
-      replaceSimples = s => s.replace(/(false|true|undefined|NaN|Infinity)(\+"")?/g, (_,b,quote) => {
-        return `${ SIMPLE[b] }${ quote ? '+[]' : '' }`
-      }),
-      replaceConstructors = s => s.replace(/String|Number/g, c => CONSTRUCTORS[c] + '["constructor"]'),
-      replaceNumbers = s => s.replace(/\d+/g, REPLACE_DIGITS),
-      replaceQuotes = s => s.replace(/""/g, '[]'),
-      replaceString = s => s.replace(/"[^"]+"/g, k => {
-            return k.substr(1,k.length - 2).split('').map(e => {
-                return transpile([CHARACTERS[e]])
-            }).join('+')
+import {
+    digitReplacer,
+    simpleReplacer,
+    constructorReplacer,
+    replaceMap,
+    replaceStrings
+} from './replacers'
+
+import {
+    fillMissingDigits,
+    fillMissingChars
+} from './fillers'
+
+/*---------------------------EXPORTS---------------------------*/
+
+export default (() => {
+    const MAPPING = compose(
+        replaceStrings,
+        replaceMap,
+        fillMissingChars,
+        fillMissingDigits
+    )(CHAR_MAP)
+
+    function encode(input, wrapWithEval, runInParentScope){
+        if (!input) return ""
+
+        const SIMPLE_OR_CHAR_RE = Object.keys(SIMPLE).join('|') + '|.',
+              OUTPUT = []
+
+        input.replace(new RegExp(SIMPLE_OR_CHAR_RE, 'g'), c => {
+            OUTPUT.push(
+                SIMPLE[c] ?
+                    "[" + SIMPLE[c] + "]+[]" :
+                    MAPPING[c] ?
+                        MAPPING[c] :
+                        decorate.stringFromCharCode(c)
+            )
         })
 
-export const encode = str => {
-    const OUTPUT = []
+        return decorate.jSFuckString(
+            decorate.digit(OUTPUT.join('+'), input), 
+            wrapWithEval, 
+            runInParentScope
+        )
+    }
 
-    str.replace(SIMPLE_KEYWORDS_OR_ALL_RE, c => {
-        OUTPUT.push(SIMPLE[c] ? SIMPLE_BRACKETS(c) : CHARACTERS[c] || c)
-    })
-
-    return transpile(OUTPUT)
-}
-
-export const transpile = src => {
-    return src.map(c => {
-        return compose(
-            replaceString,
-            replaceNumbers,
-            replaceConstructors,
-            replaceQuotes,
-            replaceSimples
-        )(c)
-    }).join('+')
-}
+    return {
+        JSFuck: {
+            encode: encode
+        }
+    }
+})()

@@ -1,12 +1,23 @@
+export const USE_CHAR_CODE = "USE_CHAR_CODE"
+export const MIN = 32
+export const MAX = 126
+export const GLOBAL = 'Function("return this")()'
 export const SIMPLE = {
-    "false": "![]",
-    "true": "!![]",
+    'false':      '![]',
+    'true':       '!![]',
     'undefined':  '[][[]]',
     'NaN':        '+[![]]',
     'Infinity':   '+(+!+[]+(!+[]+[])[!+[]+!+[]+!+[]]+[+!+[]]+[+[]]+[+[]]+[+[]])'
 }
-
-export const CHARACTERS = {
+export const CONSTRUCTORS = {
+    'Array':    '[]',
+    'Number':   '(+[])',
+    'String':   '([]+[])',
+    'Boolean':  '(![])',
+    'Function': '[]["fill"]',
+    'RegExp':   'Function("return/"+false+"/")()'
+}
+export let CHAR_MAP = {
     'a':   '(false+"")[1]',
     'b':   '([]["entries"]()+"")[2]',
     'c':   '([]["fill"]+"")[3]',
@@ -33,11 +44,65 @@ export const CHARACTERS = {
     'x':   '(+(101))["to"+String["name"]](34)[1]',
     'y':   '(NaN+[Infinity])[10]',
     'z':   '(+(35))["to"+String["name"]](36)',
-    '+':   '(+(+!+[]+(!+[]+[])[!+[]+!+[]+!+[]]+[+!+[]]+[+[]]+[+[]])+[])[+!+[]+!+[]]',
+
+    'A':   '(+[]+Array)[10]',
+    'B':   '(+[]+Boolean)[10]',
+    'C':   'Function("return escape")()(("")["italics"]())[2]',
+    'D':   'Function("return escape")()([]["fill"])["slice"]("-1")',
+    'E':   '(RegExp+"")[12]',
+    'F':   '(+[]+Function)[10]',
+    'G':   '(false+Function("return Date")()())[30]',
+    'H':   USE_CHAR_CODE,
+    'I':   '(Infinity+"")[0]',
+    'J':   USE_CHAR_CODE,
+    'K':   USE_CHAR_CODE,
+    'L':   USE_CHAR_CODE,
+    'M':   '(true+Function("return Date")()())[30]',
+    'N':   '(NaN+"")[0]',
+    'O':   '(NaN+Function("return{}")())[11]',
+    'P':   USE_CHAR_CODE,
+    'Q':   USE_CHAR_CODE,
+    'R':   '(+[]+RegExp)[10]',
+    'S':   '(+[]+String)[10]',
+    'T':   '(NaN+Function("return Date")()())[30]',
+    'U':   '(NaN+Function("return{}")()["to"+String["name"]]["call"]())[11]',
+    'V':   USE_CHAR_CODE,
+    'W':   USE_CHAR_CODE,
+    'X':   USE_CHAR_CODE,
+    'Y':   USE_CHAR_CODE,
+    'Z':   USE_CHAR_CODE,
+
+    ' ':   '(NaN+[]["fill"])[11]',
+    '!':   USE_CHAR_CODE,
     '"':   '("")["fontcolor"]()[12]',
-    '.':   '(+(+!+[]+[+!+[]]+(!![]+[])[!+[]+!+[]+!+[]]+[!+[]+!+[]]+[+[]])+[])[+!+[]]'
-}
-export const CONSTRUCTORS = {
-    'String': '([]+[])',
-    'Number': '(+[])',
+    '#':   USE_CHAR_CODE,
+    '$':   USE_CHAR_CODE,
+    '%':   'Function("return escape")()([]["fill"])[21]',
+    '&':   '("")["link"](0+")[10]',
+    '\'':  USE_CHAR_CODE,
+    '(':   '(undefined+[]["fill"])[22]',
+    ')':   '([0]+false+[]["fill"])[20]',
+    '*':   USE_CHAR_CODE,
+    '+':   '(+(+!+[]+(!+[]+[])[!+[]+!+[]+!+[]]+[+!+[]]+[+[]]+[+[]])+[])[2]',
+    ',':   '([]["slice"]["call"](false+"")+"")[1]',
+    '-':   '(+(.+[0000000001])+"")[2]',
+    '.':   '(+(+!+[]+[+!+[]]+(!![]+[])[!+[]+!+[]+!+[]]+[!+[]+!+[]]+[+[]])+[])[+!+[]]',
+    '/':   '(false+[0])["italics"]()[10]',
+    ':':   '(RegExp()+"")[3]',
+    ';':   '("")["link"](")[14]',
+    '<':   '("")["italics"]()[0]',
+    '=':   '("")["fontcolor"]()[11]',
+    '>':   '("")["italics"]()[2]',
+    '?':   '(RegExp()+"")[2]',
+    '@':   USE_CHAR_CODE,
+    '[':   '([]["entries"]()+"")[0]',
+    '\\':  USE_CHAR_CODE,
+    ']':   '([]["entries"]()+"")[22]',
+    '^':   USE_CHAR_CODE,
+    '_':   USE_CHAR_CODE,
+    '`':   USE_CHAR_CODE,
+    '{':   '(true+[]["fill"])[20]',
+    '|':   USE_CHAR_CODE,
+    '}':   '([]["fill"]+"")["slice"]("-1")',
+    '~':   USE_CHAR_CODE
 }
