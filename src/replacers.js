@@ -12,17 +12,22 @@ import {
 
 /*---------------------------EXPORTS---------------------------*/
 
+export const UNENCODED_CHARACTERS_RE = /[^\[\]\(\)\!\+]{1}/g
+
+export const valueReplacer = (MAPPING, MISSING) =>
+    c => MISSING[c] ? c : MAPPING[c]
+
 export const digitReplacer = CHAR_MAP => 
-  (_,x) => CHAR_MAP[x]
+    (_,x) => CHAR_MAP[x]
 
 export const simpleReplacer = SIMPLE => 
-  c => SIMPLE[c]
+    c => SIMPLE[c]
 
 export const constructorReplacer = CONSTRUCTORS => 
-  c => CONSTRUCTORS[c] + '["constructor"]'
+    c => CONSTRUCTORS[c] + '["constructor"]'
 
 export const mappingReplacer = (_,b) => 
-  b.split("").join("+")
+    b.split("").join("+")
 
 export const numberReplacer = CHAR_MAP => {
     return (_,y) => {
@@ -32,8 +37,8 @@ export const numberReplacer = CHAR_MAP => {
                             "+!+[]".repeat(+head).substr(+(head > 1))
 
         return [
-          output,
-          ...values
+            output,
+            ...values
         ].join("+").replace(/(\d)/g, digitReplacer(CHAR_MAP));
     }
 }
@@ -83,43 +88,34 @@ export function replaceMap(_map){
     return Object.assign({}, CHAR_MAP, ENCODED_MAP)
 }
 
-export function replaceStrings(_map){
-    var missing;
+export function replaceCharacters(char, MAPPING) {
+    const CHAR = char
 
+    return CHAR.match(UNENCODED_CHARACTERS_RE) ?
+           replaceCharacters(
+                CHAR.replace(
+                    UNENCODED_CHARACTERS_RE,
+                    simpleReplacer(MAPPING)
+                ),
+                MAPPING
+            ) :
+           CHAR
+}
+
+export function replaceStrings(_map){
     const MAPPING = Object.keys(_map).reduce((a,b) => {
                 a[b] = _map[b].replace(/\"([^\"]+)\"/gi, mappingReplacer)
                 return a
           },{}),
-          UNENCODED_CHARACTERS_RE = /[^\[\]\(\)\!\+]{1}/g,
-          ASCII_COUNT = MAX - MIN,
-          valueReplacer = c =>  missing[c] ? c : MAPPING[c]
+          ASCII_COUNT = MAX - MIN
 
-    function findMissing(){
-        missing = {};
-
-        for (const CHAR in MAPPING){
-            const VALUE = MAPPING[CHAR]
-
-            if (VALUE.match(UNENCODED_CHARACTERS_RE)){
-                missing[CHAR] = VALUE;
-                return true
-            }
+    const MISSING = Object.keys(MAPPING).reduce((a,char) => {
+        if (MAPPING[ char ].match(UNENCODED_CHARACTERS_RE)) {
+            a[ char ] = replaceCharacters(MAPPING[ char ], MAPPING)
         }
 
-        return false
-    }
+        return a
+    },{})
 
-    while (findMissing()){
-        for (const CHAR in missing){
-            const VALUE = MAPPING[CHAR].replace(UNENCODED_CHARACTERS_RE, valueReplacer);
-
-            MAPPING[CHAR] = VALUE;
-            missing[CHAR] = VALUE;
-        }
-        // if (ASCII_COUNT - 1 === 0){
-        //     console.error("Could not compile the following chars:", missing);
-        // }
-    }
-
-    return MAPPING
+    return Object.assign({},MAPPING,MISSING)
 }
