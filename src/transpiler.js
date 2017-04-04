@@ -21,13 +21,16 @@ import {
 
 /*---------------------------EXPORTS---------------------------*/
 
-export default (() => {
-    const MAPPING = compose(
+export const compileCharacterMap = _map =>
+    compose(
         replaceStrings,
         replaceMap,
         fillMissingChars,
         fillMissingDigits
-    )(CHAR_MAP)
+    )(_map)
+
+export default (() => {
+    const MAPPING = compileCharacterMap(CHAR_MAP)
 
     function encode(input, wrapWithEval, runInParentScope){
         if (!input) return ""
