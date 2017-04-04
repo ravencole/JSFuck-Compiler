@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "babel-node --stack-size=8192 test/integration.test.js"
+    "test": "mocha"
   },
   "keywords": [],
   "author": "",
@@ -14,10 +14,9 @@
     "babel-preset-latest": "^6.24.0",
     "babel-register": "^6.24.0",
     "chai": "^3.5.0",
-    "mocha": "^3.2.0"
-  },
-  "dependencies": {
+    "mocha": "^3.2.0",
     "md5": "^2.2.1",
     "nodemon": "^1.11.0"
-  }
+  },
+  "dependencies": {}
 }

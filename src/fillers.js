@@ -1,7 +1,10 @@
-                                                                                                                       /*---------------------------IMPORTS---------------------------*/
+/*---------------------------IMPORTS---------------------------*/                                                                                                                       /*---------------------------IMPORTS---------------------------*/
 
 import decorate from './decorators'
-import { USE_CHAR_CODE } from './encodingsMap'
+
+import { 
+    USE_CHAR_CODE 
+} from './encodingsMap'
 
 /*---------------------------EXPORTS---------------------------*/
 

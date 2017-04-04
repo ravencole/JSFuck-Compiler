@@ -12,7 +12,14 @@ import {
 
 /*---------------------------EXPORTS---------------------------*/
 
-export const UNENCODED_CHARACTERS_RE = /[^\[\]\(\)\!\+]{1}/g
+export const UNENCODED_CHARACTERS_RE = 
+    /[^\[\]\(\)\!\+]{1}/g
+
+export const SIMPLE_TOKENS_REGEXP = 
+    new RegExp(Object.keys(SIMPLE).join('|'), 'g')
+          
+export const CONSTRUCTOR_TOKENS_REGEXP =
+    new RegExp(Object.keys(CONSTRUCTORS).join('|'), 'g')
 
 export const valueReplacer = (MAPPING, MISSING) =>
     c => MISSING[c] ? c : MAPPING[c]
@@ -26,7 +33,7 @@ export const simpleReplacer = SIMPLE =>
 export const constructorReplacer = CONSTRUCTORS => 
     c => CONSTRUCTORS[c] + '["constructor"]'
 
-export const mappingReplacer = (_,b) => 
+export const joinAllCharactersWithPlus = (_,b) => 
     b.split("").join("+")
 
 export const numberReplacer = CHAR_MAP => {
@@ -45,10 +52,6 @@ export const numberReplacer = CHAR_MAP => {
 
 export function replaceMap(_map){
     const CHAR_MAP = _map,
-          SIMPLE_TOKENS_REGEXP
-              = new RegExp(Object.keys(SIMPLE).join('|'), 'g'),
-          CONSTRUCTOR_TOKENS_REGEXP 
-              = new RegExp(Object.keys(CONSTRUCTORS).join('|'), 'g'),
           ENCODE_CONSTRUCTOR_TOKENS 
               = replace(CONSTRUCTOR_TOKENS_REGEXP, constructorReplacer(CONSTRUCTORS)),
           ENCODE_SIMPLE_TOKENS      
@@ -88,38 +91,41 @@ export function replaceMap(_map){
     return Object.assign({}, CHAR_MAP, ENCODED_MAP)
 }
 
-export function replaceCharacters(char, MAPPING) {
+export function replaceCharacters(char, CHAR_MAP) {
 
-  while(char.match(UNENCODED_CHARACTERS_RE)) {
-    char = char.replace(UNENCODED_CHARACTERS_RE,simpleReplacer(MAPPING))
-  }
-
-  return char
-    // return char.match(UNENCODED_CHARACTERS_RE) ?
-    //        replaceCharacters(
-    //             char.replace(
-    //                 UNENCODED_CHARACTERS_RE,
-    //                 simpleReplacer(MAPPING)
-    //             ),
-    //             MAPPING
-    //         ) :
-    //        char
+  /*  We might end up using a while loop here to avoid stack overflows
+   *  from recursing this much
+   * 
+   * while(char.match(UNENCODED_CHARACTERS_RE)) {
+   *   char = char.replace(UNENCODED_CHARACTERS_RE,simpleReplacer(CHAR_MAP))
+   * }
+   * 
+   * return char
+   */
+    return char.match(UNENCODED_CHARACTERS_RE) ?
+           replaceCharacters(
+                char.replace(
+                    UNENCODED_CHARACTERS_RE,
+                    simpleReplacer(CHAR_MAP)
+                ),
+                CHAR_MAP
+            ) :
+           char
 }
 
 export function replaceStrings(_map){
-    const MAPPING = Object.keys(_map).reduce((a,b) => {
-                a[b] = _map[b].replace(/\"([^\"]+)\"/gi, mappingReplacer)
+    const CHAR_MAP = Object.keys(_map).reduce((a,b) => {
+                a[b] = _map[b].replace(/\"([^\"]+)\"/gi, joinAllCharactersWithPlus)
                 return a
-          },{}),
-          ASCII_COUNT = MAX - MIN
+          },{})
 
-    const MISSING = Object.keys(MAPPING).reduce((a,char) => {
-        if (MAPPING[ char ].match(UNENCODED_CHARACTERS_RE)) {
-            a[ char ] = replaceCharacters(MAPPING[ char ], MAPPING)
+    const MISSING = Object.keys(CHAR_MAP).reduce((a,char) => {
+        if (CHAR_MAP[ char ].match(UNENCODED_CHARACTERS_RE)) {
+            a[ char ] = replaceCharacters(CHAR_MAP[ char ], CHAR_MAP)
         }
 
         return a
     },{})
 
-    return Object.assign({}, MAPPING, MISSING)
+    return Object.assign({}, CHAR_MAP, MISSING)
 }

@@ -17,7 +17,7 @@ export const number = ( str,num ) =>
 export const stringFromCharCode = (c, encode) => 
     `([]+[])[${encode("constructor" )}]` 
          + `[${encode("fromCharCode")}]`
-         + `(${encode(c.charCodeAt(0) + "")})`
+         + `(${encode(c.charCodeAt(0)+"")})`
 
 
 export const escapeCharacters = key => 

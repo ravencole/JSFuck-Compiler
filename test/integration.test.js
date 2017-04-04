@@ -4,7 +4,7 @@ import { assert } from 'chai'
 
 import transpile from '../src/transpiler'
 
-const encode = transpile.encode
+const encode = transpile
 
 describe('JSFuck', () => {
     [
@@ -65,7 +65,7 @@ describe('JSFuck', () => {
     }) 
 
     it('can encode a merge sort program', (done) => {
-        fs.readFile('./test/mergeSort.js', 'utf-8',(err, $) => {
+        fs.readFile('./test/mergeSort.js', 'utf-8', (err, $) => {
             assert.equal($.replace(/\n/g,''), eval(encode($)))
             done()
         })

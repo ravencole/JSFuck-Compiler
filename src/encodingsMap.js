@@ -1,7 +1,12 @@
-export const USE_CHAR_CODE = "USE_CHAR_CODE"
+export const USE_CHAR_CODE = 
+    "USE_CHAR_CODE"
+
 export const MIN = 32
+
 export const MAX = 126
+
 export const GLOBAL = 'Function("return this")()'
+
 export const SIMPLE = {
     'false':      '![]',
     'true':       '!![]',
@@ -9,6 +14,7 @@ export const SIMPLE = {
     'NaN':        '+[![]]',
     'Infinity':   '+(+!+[]+(!+[]+[])[!+[]+!+[]+!+[]]+[+!+[]]+[+[]]+[+[]]+[+[]])'
 }
+
 export const CONSTRUCTORS = {
     'Array':    '[]',
     'Number':   '(+[])',
@@ -17,6 +23,7 @@ export const CONSTRUCTORS = {
     'Function': '[]["fill"]',
     'RegExp':   'Function("return/"+false+"/")()'
 }
+
 export let CHAR_MAP = {
     'a':   '(false+"")[1]',
     'b':   '([]["entries"]()+"")[2]',

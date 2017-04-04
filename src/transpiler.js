@@ -11,7 +11,8 @@ import {
 
 import {
     replaceMap,
-    replaceStrings
+    replaceStrings,
+    SIMPLE_TOKENS_REGEXP
 } from './replacers'
 
 import {
@@ -30,33 +31,40 @@ export const compileCharacterMap = _map =>
     )(_map)
 
 export default (() => {
-    const MAPPING = compileCharacterMap(CHAR_MAP)
+    const COMPILED_CHAR_MAP = compileCharacterMap(CHAR_MAP),
+          SIMPLE_TYPES      = SIMPLE
 
     function encode(input, wrapWithEval, runInParentScope){
-        if (!input) return ""
+        if (!input) {
+            console.warn(`Input must me a truthy String`)
+            return ""
+        }
 
-        const SIMPLE_OR_CHAR_RE = Object.keys(SIMPLE).join('|') + '|.',
+                                  /* /false|true|undefined|NaN|Infinity|./g */
+                                  /*        catches every character         */
+        const SIMPLE_OR_CHAR_RE = SIMPLE_TOKENS_REGEXP + '|.',
               OUTPUT = []
 
         input.replace(new RegExp(SIMPLE_OR_CHAR_RE, 'g'), c => {
             OUTPUT.push(
-                SIMPLE[c] ?
-                    "[" + SIMPLE[c] + "]+[]" :
-                    MAPPING[c] ?
-                        MAPPING[c] :
+                SIMPLE_TYPES[c] ?
+                    "[" + SIMPLE_TYPES[c] + "]+[]" :
+                    COMPILED_CHAR_MAP[c] ?
+                        COMPILED_CHAR_MAP[c] :
                         decorate.stringFromCharCode(c, encode)
             )
         })
 
         return decorate.jSFuckString(
-            decorate.digit(OUTPUT.join('+'), input), 
+            decorate.digit(
+                OUTPUT.join('+'), 
+                input
+            ), 
             wrapWithEval, 
             runInParentScope,
             encode
         )
     }
 
-    return {
-        encode
-    }
+    return encode
 })()
