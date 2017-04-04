@@ -1,3 +1,3 @@
 import transpile from './transpiler'
 
-export default transpile.encode
+export default transpile
