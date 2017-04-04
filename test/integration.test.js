@@ -1,3 +1,5 @@
+import fs from 'fs'
+import path from 'path'
 import { assert } from 'chai'
 
 import transpile from '../src/transpiler'
@@ -34,6 +36,38 @@ describe('JSFuck', () => {
     ].map(test => {
         it(test.desc, () => {
             assert.equal(encode(test.input), test.expected)
+        })
+    })
+
+    const MIN = 32,
+          MAX = 127;
+
+    [...Array(MAX-MIN)].map((_,i) => {
+        const char = String.fromCharCode(i+MIN)
+        it(`can encode the character ${char}`, () => {
+            assert.equal(char, eval(encode(char)))
+        })
+    })
+
+    it('encode array functions', () => {
+        assert.equal([1,2,3,4,5].reduce((a,b) => a+b,0), eval(eval(encode('[1,2,3,4,5].reduce((a,b) => a+b,0)'))))
+    })
+
+    it('can encode multiline programs', () => {
+        const INPUT = "(function(a,b) {" 
+                    + "    if (a > b) {"
+                    + "        return a"
+                    + "    }"
+                    + "    return b"
+                    + "})(6,7)"
+
+        assert.equal(7, eval(eval(encode(INPUT))))
+    }) 
+
+    it('can encode a merge sort program', (done) => {
+        fs.readFile(path.join(__dirname, './mergeSort.js'), 'utf-8',(err, $) => {
+            assert.equal($.replace(/\n/g,''), eval(encode($)))
+            done()
         })
     })
 })

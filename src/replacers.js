@@ -89,17 +89,21 @@ export function replaceMap(_map){
 }
 
 export function replaceCharacters(char, MAPPING) {
-    const CHAR = char
 
-    return CHAR.match(UNENCODED_CHARACTERS_RE) ?
-           replaceCharacters(
-                CHAR.replace(
-                    UNENCODED_CHARACTERS_RE,
-                    simpleReplacer(MAPPING)
-                ),
-                MAPPING
-            ) :
-           CHAR
+  while(char.match(UNENCODED_CHARACTERS_RE)) {
+    char = char.replace(UNENCODED_CHARACTERS_RE,simpleReplacer(MAPPING))
+  }
+
+  return char
+    // return char.match(UNENCODED_CHARACTERS_RE) ?
+    //        replaceCharacters(
+    //             char.replace(
+    //                 UNENCODED_CHARACTERS_RE,
+    //                 simpleReplacer(MAPPING)
+    //             ),
+    //             MAPPING
+    //         ) :
+    //        char
 }
 
 export function replaceStrings(_map){
@@ -117,5 +121,5 @@ export function replaceStrings(_map){
         return a
     },{})
 
-    return Object.assign({},MAPPING,MISSING)
+    return Object.assign({}, MAPPING, MISSING)
 }
