@@ -9,6 +9,8 @@ Below is unfinished documentation of how JSFuck works under the hood:
 
 JSFuck is an implementation of JavaScript using just six characters; it's also an implementation of JavaScript using the language's six most powerful operators.
 
+    ()[]!+
+
 The brackets are going to provide us with access to Array's Prototype, along with powerful type casting. The parens are used for exactly two operations; Calling functions and isolating expressions. The + operator is used equally as an addition operator, concatenation operator, and a cast to Integer operator. Lastly, the ! operator will be used for casting values to Booleans, and negation.
 
 This is the most important idea in this article, so read it a few times to really internalize how JSFuck works. JSFuck allows us to create a string representation of all possible JavaScript source codes, then run that code within an eval statement that is also encoded using JSFuck. For example:
